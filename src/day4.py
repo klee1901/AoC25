@@ -50,7 +50,7 @@ def getNAccessibleReams(reamLocs, grid):
     """
     Input
     -----
-    reamLocs - list of list of ints
+    reamLocs - list of lists of ints
         coords of '@' characters in grid
     grid - list of strings (containing '@' or '.' characters)
         grid to search surroundings of '@' characters
@@ -61,14 +61,19 @@ def getNAccessibleReams(reamLocs, grid):
     """
     height = len(grid)
     width = len(grid[0])
-    nAccessibleReams = 0
+    accessibleReams = []
     for reamLoc in reamLocs:
         neighbourLocs = getNeighbours(reamLoc[0], reamLoc[1], height, width)
         neighbours = [grid[neigh[0]][neigh[1]] for neigh in neighbourLocs]
         if neighbours.count('@') < 4:
-            nAccessibleReams += 1
+            accessibleReams += [reamLoc]
+    for reamLoc in accessibleReams:
+        reamLocs.remove(reamLoc)
+        grid[reamLoc[0]] = grid[reamLoc[0]][:reamLoc[1]] + '.' + grid[reamLoc[0]][(reamLoc[1]+1):]
 
-    return nAccessibleReams
+    if len(accessibleReams) == 0:
+        return [0]
+    return [len(accessibleReams)] + getNAccessibleReams(reamLocs, grid)
 
 script_path = os.path.dirname(__file__)
 rel_filepath = "../Input/day4.txt"
@@ -78,6 +83,7 @@ with open(input_filepath) as file:
     rows = file.readlines()
 rows = [row.strip() for row in rows]
 paperLocs = getLocationOfReams(rows)
+NReamsRemovable = getNAccessibleReams(paperLocs, rows)
 
-print("Part 1: ", getNAccessibleReams(paperLocs, rows))
-print("Part 2: ", "TBD")
+print("Part 1: ", NReamsRemovable[0])
+print("Part 2: ", sum(NReamsRemovable))
