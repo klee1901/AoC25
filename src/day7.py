@@ -6,6 +6,7 @@ input_filepath = os.path.join(script_path, rel_filepath)
 
 with open(input_filepath) as file:
     lines = file.readlines()
+
 beams = [lines[0].index('S')]
 rowNum = 0
 splits = 0
@@ -23,5 +24,13 @@ while rowNum < len(lines):
     rowNum += 1
     beams = nxtBeams
 
+width = len(lines[1].strip())
+timelines = [1]*width
+for i in range(1, len(lines)):
+    splitterInds = [j for j, x in enumerate(lines[len(lines)-i-1]) if x=='^']
+    for j in splitterInds:
+        timelines[j] = timelines[j-1]+timelines[j+1]
+
+
 print("Part 1: ", splits)
-print("Part 2: ", "TBD")
+print("Part 2: ", timelines[lines[0].index('S')])
